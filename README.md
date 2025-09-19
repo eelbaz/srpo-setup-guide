@@ -317,5 +317,3 @@ MPS available: True
 4. **Custom workflows**: Modify the SRPO workflow for specific use cases
 
 ---
-
-**Note**: This guide was tested on macOS 15.6.1 with Apple Silicon (ARM64), Python 3.13.7, and uv 0.8.18. The SRPO model download reached 4.8GB before interruption - resume the download to get the full 23.8GB model file.
