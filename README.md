@@ -1,5 +1,4 @@
-# Flux SRPO in ComfyUI | Realistic Images with No Plastic "AI" generated Look
-# SRPO (Semantic Relative Preference Optimization) On OSX Silicon Setup Guide
+#   SRPO On OSX Silicon Setup Guide - Flux SRPO in ComfyUI | Realistic Images with No Plastic "AI" generated Look
 
 A comprehensive guide to setting up SRPO with ComfyUI using uv on macOS ARM64 (Apple Silicon).
 
