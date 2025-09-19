@@ -1,4 +1,5 @@
-# SRPO (Semantic Relative Preference Optimization) OSX Silicon Setup Guide
+# Flux SRPO in ComfyUI | Realistic Images with No Plastic Look
+# SRPO (Semantic Relative Preference Optimization) On OSX Silicon Setup Guide
 
 A comprehensive guide to setting up SRPO with ComfyUI using uv on macOS ARM64 (Apple Silicon).
 
