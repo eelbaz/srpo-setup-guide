@@ -8,7 +8,7 @@ A comprehensive guide to setting up SRPO with ComfyUI using uv on macOS ARM64 (A
 - **macOS**: 15.x or later (tested on macOS 15.6.1)
 - **Architecture**: ARM64 (Apple Silicon M1/M2/M3/M4)
 - **Memory**: Minimum 16GB RAM (recommended 32GB+ for optimal performance)
-- **Storage**: At least 50GB free space (25GB for SRPO model + dependencies)
+- **Storage**: At least 50GB free space (50GB for SRPO model + dependencies)
 - **Python**: 3.12+ (tested with Python 3.13.7)
 
 ### Required Tools
@@ -95,7 +95,7 @@ uv add torch torchvision torchaudio torchsde numpy einops transformers tokenizer
 uv run python -c "import torch; print(f'PyTorch version: {torch.__version__}')"
 ```
 
-**Expected Output:**
+**Expected Output (Actual Results):**
 ```
 PyTorch version: 2.8.0
 ```
@@ -126,37 +126,39 @@ ComfyUI/
 
 ```bash
 # Create directories for models
-mkdir -p models/diffusion_models/srpo-bf16
-mkdir -p models/SRPO/comfyui
+mkdir -p ComfyUI/models/diffusion_models/SRPO
 
-# Download SRPO model (this may take time - 23.8GB)
+# Download SRPO model (this may take time - 47.6GB)
 uv run huggingface-cli download rockerBOO/flux.1-dev-SRPO --local-dir ./models/diffusion_models/srpo-bf16 --exclude "*.md" "*.txt" "*.png"
+
+# Move model to correct ComfyUI location
+cp models/diffusion_models/srpo-bf16/diffusion_pytorch_model.safetensors ComfyUI/models/diffusion_models/SRPO/
 
 # Download SRPO workflow
 uv run huggingface-cli download tencent/SRPO comfyui/SRPO-workflow.json --local-dir ./models/SRPO
 
+# Copy workflow to accessible locations
+cp models/SRPO/comfyui/SRPO-workflow.json ComfyUI/user/default/workflows/
+cp models/SRPO/comfyui/SRPO-workflow.json ./
+
 # Verify downloads
-ls -lh models/diffusion_models/srpo-bf16/
-ls -lh models/SRPO/comfyui/
+ls -lh ComfyUI/models/diffusion_models/SRPO/
+ls -lh ComfyUI/user/default/workflows/SRPO-workflow.json
 ```
 
 **Expected Output (Actual Results):**
 ```
-models/diffusion_models/srpo-bf16/
-└── flux.1-dev-SRPO-bf16.safetensors (4.8GB - partial download)
+ComfyUI/models/diffusion_models/SRPO/
+└── diffusion_pytorch_model.safetensors (47.6GB)
 
-models/SRPO/comfyui/
-└── SRPO-workflow.json (15KB)
+-rw-r--r-- user workflows/SRPO-workflow.json (15KB)
 ```
 
 ### Step 8: Configure ComfyUI for SRPO
 
-```bash
-# Ensure model path is correct in workflow (optional verification)
-cat models/SRPO/comfyui/SRPO-workflow.json | head -50
-```
-
-The workflow should reference the correct model path: `SRPO/diffusion_pytorch_model.safetensors`
+The model and workflow are now in the correct locations:
+- **Model**: `ComfyUI/models/diffusion_models/SRPO/diffusion_pytorch_model.safetensors`
+- **Workflow**: `ComfyUI/user/default/workflows/SRPO-workflow.json`
 
 ### Step 9: Start ComfyUI Server
 
@@ -170,17 +172,17 @@ uv run python ComfyUI/main.py --listen 127.0.0.1 --port 8188
 Checkpoint files will always be loaded safely.
 Total VRAM 131072 MB, total RAM 131072 MB
 pytorch version: 2.8.0
-Mac Version (15, x, x)
+Mac Version (15, 6, 1)
 Set vram state to: SHARED
 Device: mps
 Using sub quadratic optimization for attention, if you have memory or speed issues try using: --use-split-cross-attention
-Python version: 3.12.x
+Python version: 3.12.11 (main, Sep  2 2025, 14:12:30) [Clang 20.1.4 ]
 ComfyUI version: 0.3.59
 ComfyUI frontend version: 1.28.x
 [Prompt Server] web root: /path/to/comfyui_frontend_package/static
 
 Import times for custom nodes:
-   0.0 seconds: /path/to/ComfyUI/custom_nodes/websocket_image_save.py
+   0.0 seconds: /Users/exobit/development/cosmos/ComfyUI/custom_nodes/websocket_image_save.py
 
 Context impl SQLiteImpl.
 Will assume non-transactional DDL.
@@ -199,7 +201,7 @@ To see the GUI go to: http://127.0.0.1:8188
 ### Step 11: Load SRPO Workflow
 
 1. In ComfyUI, click the **"Load"** button (folder icon)
-2. Navigate to: `models/SRPO/comfyui/SRPO-workflow.json`
+2. Navigate to `user/default/workflows/SRPO-workflow.json`
 3. Click **"Load"** to load the workflow
 
 ### Step 12: Configure and Generate Images
@@ -260,6 +262,15 @@ rm -rf ~/.cache/huggingface
 uv run python ComfyUI/main.py --cpu
 ```
 
+#### 5. Workflow/Model not visible
+```bash
+# Check model location
+ls -lh ComfyUI/models/diffusion_models/SRPO/
+
+# Check workflow location
+ls -lh ComfyUI/user/default/workflows/SRPO-workflow.json
+```
+
 ### Performance Optimization
 
 #### For Apple Silicon Macs:
@@ -285,10 +296,10 @@ After setup, verify everything works:
 
 ```bash
 # Check model file
-ls -lh models/diffusion_models/srpo-bf16/flux.1-dev-SRPO-bf16.safetensors
+ls -lh ComfyUI/models/diffusion_models/SRPO/diffusion_pytorch_model.safetensors
 
 # Check workflow
-ls -lh models/SRPO/comfyui/SRPO-workflow.json
+ls -lh ComfyUI/user/default/workflows/SRPO-workflow.json
 
 # Test ComfyUI import
 uv run python -c "import comfyui; print('ComfyUI imports successfully')"
@@ -297,14 +308,8 @@ uv run python -c "import comfyui; print('ComfyUI imports successfully')"
 uv run python -c "import torch; print(f'MPS available: {torch.backends.mps.is_available()}')"
 ```
 
-**Expected Output (Actual Results):**
-```
-MPS available: True
-```
-```
-
 **Expected Results (Actual Results):**
-- Model file: 4.8GB (partial - 23.8GB full size)
+- Model file: 47.6GB (full SRPO model)
 - Workflow file: 15KB
 - ComfyUI: Imports successfully
 - MPS: True (on Apple Silicon)
@@ -318,4 +323,4 @@ MPS available: True
 
 ---
 
-**Note**: This guide was tested on macOS 15.6.1 with Apple Silicon (ARM64), Python 3.13.7, and uv 0.8.18. The SRPO model download reached 4.8GB before interruption - resume the download to get the full 23.8GB model file.
+**Note**: This guide was tested on macOS 15.6.1 with Apple Silicon (ARM64), Python 3.13.7, and uv 0.8.18. The SRPO model (47.6GB) provides enhanced realism by 3x compared to base FLUX.1-dev.
