@@ -1,4 +1,4 @@
-# SRPO (Semantic Relative Preference Optimization) Setup Guide
+# SRPO +ComfyUI (Semantic Relative Preference Optimization) Setup Guide
 
 A comprehensive guide to setting up SRPO with ComfyUI using uv on macOS ARM64 (Apple Silicon).
 
